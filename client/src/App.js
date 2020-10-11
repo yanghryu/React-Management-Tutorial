@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import Customer from './components/Customer';
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
@@ -8,49 +8,36 @@ import TableCell from '@material-ui/core/TableCell';
 import {withStyles} from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import './App.css';
-import { render } from '@testing-library/react';
 
 const styles = theme =>({
   root: {
     width:'100%',
-    marginTop: theme.spacing.unit * 3,
+    marginTop: theme.spacing(3),
     overflowX : "auto"
   },
   table: {
     minWidth:1080
   }
 })
-const customers = [
-  {
-    'id':1,
-    'image':'./image/1.jpg',
-    'name':'홍길동',
-    'birthday':'20010320',
-    'gender':'남자',
-    'job':'programer'
+
+class App extends Component { 
+
+  state = {
+    customers:""
   }
-,
-{
-  'id':2,
-  'image':'./image/2.jpg',
-  'name':'이순신',
-  'birthday':'20010320',
-  'gender':'남자',
-  'job':'장군'
-},
-{
-  'id':3,
-  'image':'./image/1.jpg',
-  'name':'유관순',
-  'birthday':'20010320',
-  'gender':'여자',
-  'job':'운동가'
-}
-]; 
+  componentDidMount(){
+    this.callApi()
+    .then(res =>this.setState({customers:res}))
+    .catch(err => console.log(err));
 
-function App(props) { 
-
-  const { classes } = props;
+  }
+  callApi = async () => {
+    const response = await fetch('/api/customers');
+    const body = await response.json();
+    return body;
+  }
+  render(){
+    const { classes } = this.props;
     return (
       <Paper className={classes.root }>
       
@@ -67,7 +54,7 @@ function App(props) {
           </TableHead>
           <TableBody>
           {
-            customers.map(c => {
+            this.state.customers? this.state.customers.map(c => {
               return(
                   <Customer 
                       key = {c.id}
@@ -79,7 +66,7 @@ function App(props) {
                       job={c.job}
                     />          
               )
-            })
+            }):""
           }
         </TableBody>
         </Table>
@@ -87,6 +74,8 @@ function App(props) {
       </Paper>
     
     );
+  }
+
 
 }
 
